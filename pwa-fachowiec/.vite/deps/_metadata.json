@@ -1,0 +1,34 @@
+{
+  "hash": "94be47dd",
+  "configHash": "378e80ec",
+  "lockfileHash": "7ebcaacf",
+  "browserHash": "9a6e3a88",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "f7960c28",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "c2263615",
+      "needsInterop": true
+    },
+    "localforage": {
+      "src": "../../node_modules/localforage/dist/localforage.js",
+      "file": "localforage.js",
+      "fileHash": "1b93b561",
+      "needsInterop": true
+    }
+  },
+  "chunks": {
+    "chunk-ZDD5PKOZ": {
+      "file": "chunk-ZDD5PKOZ.js"
+    },
+    "chunk-VUNV25KB": {
+      "file": "chunk-VUNV25KB.js"
+    }
+  }
+}

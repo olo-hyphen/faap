@@ -1,33 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { saveJob, getAllJobs } from './data/jobStore';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [jobs, setJobs] = useState([]);
+  const [newJob, setNewJob] = useState('');
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      const allJobs = await getAllJobs();
+      setJobs(allJobs);
+    };
+    fetchJobs();
+  }, []);
+
+  const handleAddJob = async (e) => {
+    e.preventDefault();
+    if (newJob.trim() === '') return;
+
+    await saveJob({ description: newJob, status: 'Lokalny' });
+    setNewJob('');
+    const allJobs = await getAllJobs();
+    setJobs(allJobs);
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+      <h1>PWA Fachowiec</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+        <h2>Nowe Zlecenie</h2>
+        <form onSubmit={handleAddJob}>
+          <input
+            type="text"
+            value={newJob}
+            onChange={(e) => setNewJob(e.target.value)}
+            placeholder="Opis zlecenia"
+          />
+          <button type="submit">Dodaj Zlecenie</button>
+        </form>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <div className="card">
+        <h2>Lista Zleceń</h2>
+        <ul>
+          {jobs.map(job => (
+            <li key={job.id}>
+              {job.description} - <strong>{job.status}</strong>
+            </li>
+          ))}
+        </ul>
+      </div>
     </>
   )
 }

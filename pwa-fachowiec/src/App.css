@@ -40,3 +40,25 @@
 .read-the-docs {
   color: #888;
 }
+
+form {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+input {
+  padding: 0.5rem;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: #f4f4f4;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
