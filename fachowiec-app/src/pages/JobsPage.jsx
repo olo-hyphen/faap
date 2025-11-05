@@ -38,6 +38,7 @@ import {
   Delete,
 } from '@mui/icons-material';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const mockJobs = [
   {
@@ -109,10 +110,12 @@ const getPriorityColor = (priority) => {
 };
 
 const JobsPage = () => {
+  const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [jobs, setJobs] = useState(mockJobs);
   const [searchTerm, setSearchTerm] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
+  const [editingJob, setEditingJob] = useState(null);
   const [newJob, setNewJob] = useState({
     title: '',
     client: '',
@@ -127,11 +130,34 @@ const JobsPage = () => {
   };
 
   const handleOpenDialog = () => {
+    setEditingJob(null);
+    setNewJob({
+      title: '',
+      client: '',
+      status: 'Zaplanowane',
+      priority: 'Średni',
+      date: '',
+      description: '',
+    });
+    setOpenDialog(true);
+  };
+
+  const handleEditJob = (job) => {
+    setEditingJob(job);
+    setNewJob({
+      title: job.title,
+      client: job.client,
+      status: job.status,
+      priority: job.priority,
+      date: job.date,
+      description: job.description || '',
+    });
     setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
+    setEditingJob(null);
     setNewJob({
       title: '',
       client: '',
@@ -143,12 +169,22 @@ const JobsPage = () => {
   };
 
   const handleAddJob = () => {
-    const job = {
-      ...newJob,
-      id: jobs.length + 1,
-      icon: <Construction />,
-    };
-    setJobs([...jobs, job]);
+    if (editingJob) {
+      // Edycja istniejącego zlecenia
+      setJobs(jobs.map(job => 
+        job.id === editingJob.id 
+          ? { ...newJob, id: editingJob.id, icon: editingJob.icon }
+          : job
+      ));
+    } else {
+      // Dodawanie nowego zlecenia
+      const job = {
+        ...newJob,
+        id: jobs.length + 1,
+        icon: <Construction />,
+      };
+      setJobs([...jobs, job]);
+    }
     handleCloseDialog();
   };
 
@@ -214,7 +250,11 @@ const JobsPage = () => {
 
       <List>
         {filteredJobs.map((job) => (
-          <Card key={job.id} sx={{ mb: 2 }}>
+          <Card 
+            key={job.id} 
+            sx={{ mb: 2, cursor: 'pointer' }}
+            onClick={() => navigate(`/jobs/${job.id}`)}
+          >
             <CardContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <Box sx={{ display: 'flex', gap: 2, flexGrow: 1 }}>
@@ -245,8 +285,12 @@ const JobsPage = () => {
                     </Box>
                   </Box>
                 </Box>
-                <Box>
-                  <IconButton size="small" color="primary">
+                <Box onClick={(e) => e.stopPropagation()}>
+                  <IconButton 
+                    size="small" 
+                    color="primary"
+                    onClick={() => handleEditJob(job)}
+                  >
                     <Edit />
                   </IconButton>
                   <IconButton
@@ -279,7 +323,7 @@ const JobsPage = () => {
       </Fab>
 
       <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-        <DialogTitle>Dodaj nowe zlecenie</DialogTitle>
+        <DialogTitle>{editingJob ? 'Edytuj zlecenie' : 'Dodaj nowe zlecenie'}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -342,7 +386,7 @@ const JobsPage = () => {
         <DialogActions>
           <Button onClick={handleCloseDialog}>Anuluj</Button>
           <Button onClick={handleAddJob} variant="contained">
-            Dodaj
+            {editingJob ? 'Zapisz' : 'Dodaj'}
           </Button>
         </DialogActions>
       </Dialog>
