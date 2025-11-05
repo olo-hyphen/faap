@@ -22,6 +22,12 @@ import {
   ElectricalServices,
   Plumbing,
   FormatPaint,
+  Assessment,
+  Description,
+  Settings,
+  CalendarMonth,
+  ListAlt,
+  Group,
 } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -118,7 +124,11 @@ const DashboardPage = () => {
         </Grid>
       </Grid>
 
-      <Grid container spacing={2} sx={{ my: 2 }}>
+      <Typography variant="h6" fontWeight="bold" sx={{ pt: 2, pb: 1 }}>
+        Szybkie akcje
+      </Typography>
+
+      <Grid container spacing={2} sx={{ mb: 2 }}>
         <Grid item xs={12} sm={6}>
             <Button 
                 variant="contained" 
@@ -138,6 +148,79 @@ const DashboardPage = () => {
             >
                 Dodaj klienta
             </Button>
+        </Grid>
+      </Grid>
+
+      <Typography variant="h6" fontWeight="bold" sx={{ pt: 2, pb: 1 }}>
+        Szybkie linki
+      </Typography>
+
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid item xs={6} sm={4}>
+          <Card 
+            sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+            onClick={() => navigate('/jobs')}
+          >
+            <CardContent sx={{ textAlign: 'center', py: 2 }}>
+              <ListAlt color="primary" sx={{ fontSize: 32, mb: 1 }} />
+              <Typography variant="body2">Zlecenia</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6} sm={4}>
+          <Card 
+            sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+            onClick={() => navigate('/clients')}
+          >
+            <CardContent sx={{ textAlign: 'center', py: 2 }}>
+              <Group color="primary" sx={{ fontSize: 32, mb: 1 }} />
+              <Typography variant="body2">Klienci</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6} sm={4}>
+          <Card 
+            sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+            onClick={() => navigate('/calendar')}
+          >
+            <CardContent sx={{ textAlign: 'center', py: 2 }}>
+              <CalendarMonth color="primary" sx={{ fontSize: 32, mb: 1 }} />
+              <Typography variant="body2">Kalendarz</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6} sm={4}>
+          <Card 
+            sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+            onClick={() => navigate('/reports')}
+          >
+            <CardContent sx={{ textAlign: 'center', py: 2 }}>
+              <Assessment color="primary" sx={{ fontSize: 32, mb: 1 }} />
+              <Typography variant="body2">Raporty</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6} sm={4}>
+          <Card 
+            sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+            onClick={() => navigate('/estimates')}
+          >
+            <CardContent sx={{ textAlign: 'center', py: 2 }}>
+              <Description color="primary" sx={{ fontSize: 32, mb: 1 }} />
+              <Typography variant="body2">Oferty</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6} sm={4}>
+          <Card 
+            sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+            onClick={() => navigate('/settings')}
+          >
+            <CardContent sx={{ textAlign: 'center', py: 2 }}>
+              <Settings color="primary" sx={{ fontSize: 32, mb: 1 }} />
+              <Typography variant="body2">Ustawienia</Typography>
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
 

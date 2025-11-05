@@ -7,6 +7,9 @@ import DashboardPage from '../pages/DashboardPage';
 import JobsPage from '../pages/JobsPage';
 import JobDetailPage from '../pages/JobDetailPage';
 import CalendarPage from '../pages/CalendarPage';
+import ReportsPage from '../pages/ReportsPage';
+import EstimatesPage from '../pages/EstimatesPage';
+import SettingsPage from '../pages/SettingsPage';
 
 const AppRouter = () => {
   return (
@@ -19,6 +22,9 @@ const AppRouter = () => {
         <Route path="/jobs" element={<JobsPage />} />
         <Route path="/jobs/:id" element={<JobDetailPage />} />
         <Route path="/calendar" element={<CalendarPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/estimates" element={<EstimatesPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
     </Routes>
   );

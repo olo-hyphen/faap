@@ -35,6 +35,7 @@ import {
   Construction,
 } from '@mui/icons-material';
 import { useState } from 'react';
+import { detectScheduleConflicts, getConflictsForDate } from '../utils/scheduleConflictDetector';
 
 const monthNames = [
   'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
@@ -52,6 +53,7 @@ const mockEvents = [
     time: '9:00',
     icon: <ElectricalServices />,
     color: 'primary',
+    status: 'W trakcie',
   },
   {
     id: 2,
@@ -61,6 +63,7 @@ const mockEvents = [
     time: '14:00',
     icon: <Plumbing />,
     color: 'info',
+    status: 'Zaplanowane',
   },
   {
     id: 3,
@@ -70,15 +73,17 @@ const mockEvents = [
     time: '10:00',
     icon: <FormatPaint />,
     color: 'warning',
+    status: 'Zaplanowane',
   },
   {
     id: 4,
     title: 'Konsultacja budowlana',
     client: 'Tech Corp',
     date: '2025-11-06',
-    time: '15:00',
+    time: '10:00', // Changed to create conflict with event 1
     icon: <Construction />,
     color: 'success',
+    status: 'Zaplanowane',
   },
 ];
 
@@ -87,12 +92,31 @@ const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [events, setEvents] = useState(mockEvents);
   const [openDialog, setOpenDialog] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all');
   const [newEvent, setNewEvent] = useState({
     title: '',
     client: '',
     date: '',
     time: '',
+    status: 'Zaplanowane',
   });
+
+  // Convert events to jobs format for conflict detection
+  const jobs = events.map(event => ({
+    id: event.id,
+    scheduledDate: event.date,
+    scheduledTime: event.time,
+    title: event.title,
+    status: event.status || 'Zaplanowane',
+  }));
+
+  // Filter events by status
+  const filteredEvents = statusFilter === 'all' 
+    ? events 
+    : events.filter(event => event.status === statusFilter);
+
+  // Get conflicts for all dates
+  const conflicts = getConflictsForDate(jobs, currentDate);
 
   const getDaysInMonth = (date) => {
     const year = date.getFullYear();
@@ -107,7 +131,15 @@ const CalendarPage = () => {
 
   const getEventsForDate = (date) => {
     const dateStr = date.toISOString().split('T')[0];
-    return events.filter(event => event.date === dateStr);
+    return filteredEvents.filter(event => event.date === dateStr);
+  };
+
+  const hasConflictsOnDate = (date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return conflicts.some(conflict => {
+      const conflictDate = new Date(conflict.scheduledDate);
+      return conflictDate.toISOString().split('T')[0] === dateStr;
+    });
   };
 
   const handlePreviousMonth = () => {
@@ -138,11 +170,32 @@ const CalendarPage = () => {
   };
 
   const handleAddEvent = () => {
+    const newJob = {
+      id: events.length + 1,
+      scheduledDate: newEvent.date,
+      scheduledTime: newEvent.time,
+      title: newEvent.title,
+      status: newEvent.status || 'Zaplanowane',
+    };
+
+    // Check for conflicts
+    const conflictJobs = detectScheduleConflicts(jobs, newJob);
+    
+    if (conflictJobs.length > 0) {
+      const confirmAdd = window.confirm(
+        `Uwaga: Wykryto ${conflictJobs.length} konflikt(ów) harmonogramu w tym dniu. Czy chcesz kontynuować?`
+      );
+      if (!confirmAdd) {
+        return;
+      }
+    }
+
     const event = {
       ...newEvent,
-      id: events.length + 1,
+      id: newJob.id,
       icon: <Construction />,
       color: 'primary',
+      status: newEvent.status || 'Zaplanowane',
     };
     setEvents([...events, event]);
     handleCloseDialog();
@@ -181,7 +234,12 @@ const CalendarPage = () => {
             sx={{
               height: 80,
               border: 1,
-              borderColor: isSelected ? 'primary.main' : 'divider',
+              borderColor: hasConflictsOnDate(date) 
+                ? 'error.main' 
+                : isSelected 
+                  ? 'primary.main' 
+                  : 'divider',
+              borderWidth: hasConflictsOnDate(date) ? 2 : 1,
               borderRadius: 1,
               p: 0.5,
               cursor: 'pointer',
@@ -273,6 +331,28 @@ const CalendarPage = () => {
               <ChevronRight />
             </IconButton>
           </Box>
+
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel>Filtr statusu</InputLabel>
+            <Select
+              value={statusFilter}
+              label="Filtr statusu"
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <MenuItem value="all">Wszystkie</MenuItem>
+              <MenuItem value="Zaplanowane">Zaplanowane</MenuItem>
+              <MenuItem value="W trakcie">W trakcie</MenuItem>
+              <MenuItem value="Zakończone">Zakończone</MenuItem>
+            </Select>
+          </FormControl>
+
+          {conflicts.length > 0 && (
+            <Box sx={{ mb: 2, p: 1, bgcolor: 'error.dark', borderRadius: 1 }}>
+              <Typography variant="caption" color="error.contrastText">
+                ⚠️ Wykryto {conflicts.length} konflikt(ów) harmonogramu w tym miesiącu
+              </Typography>
+            </Box>
+          )}
 
           <Grid container spacing={0.5}>
             {dayNames.map((day) => (
@@ -378,7 +458,20 @@ const CalendarPage = () => {
             InputLabelProps={{
               shrink: true,
             }}
+            sx={{ mb: 2 }}
           />
+          <FormControl fullWidth>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={newEvent.status || 'Zaplanowane'}
+              label="Status"
+              onChange={(e) => setNewEvent({ ...newEvent, status: e.target.value })}
+            >
+              <MenuItem value="Zaplanowane">Zaplanowane</MenuItem>
+              <MenuItem value="W trakcie">W trakcie</MenuItem>
+              <MenuItem value="Zakończone">Zakończone</MenuItem>
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Anuluj</Button>
