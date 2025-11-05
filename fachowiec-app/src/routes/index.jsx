@@ -2,12 +2,9 @@ import { Routes, Route } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
 import ProtectedRoute from './ProtectedRoute';
 import ClientListPage from '../pages/ClientListPage';
-
 import DashboardPage from '../pages/DashboardPage';
-
-// Placeholder components for now
-const JobsPage = () => <div>Jobs Page</div>;
-const CalendarPage = () => <div>Calendar Page</div>;
+import JobsPage from '../pages/JobsPage';
+import CalendarPage from '../pages/CalendarPage';
 
 const AppRouter = () => {
   return (
