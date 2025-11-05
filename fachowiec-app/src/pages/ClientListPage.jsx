@@ -12,8 +12,20 @@ import {
   ListItemText,
   Toolbar,
   Typography,
+  Fab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
-import { Search, Group, SwapVert, ChevronRight } from '@mui/icons-material';
+import { Search, Group, SwapVert, ChevronRight, Add } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import mockClients from '../data/mockClients';
 
 const getStatusColor = (status) => {
@@ -30,12 +42,48 @@ const getStatusColor = (status) => {
 };
 
 const ClientListPage = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [clients, setClients] = useState(mockClients);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newClient, setNewClient] = useState({
+    name: '',
+    contact: '',
+    status: 'active',
+  });
 
-  const filteredClients = mockClients.filter(client =>
+  const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.contact.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setNewClient({
+      name: '',
+      contact: '',
+      status: 'active',
+    });
+  };
+
+  const handleAddClient = () => {
+    const client = {
+      ...newClient,
+      id: clients.length + 1,
+      initials: newClient.name
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2),
+    };
+    setClients([...clients, client]);
+    handleCloseDialog();
+  };
 
   return (
     <Container maxWidth="md" disableGutters>
@@ -70,7 +118,11 @@ const ClientListPage = () => {
 
       <List sx={{ width: '100%' }}>
         {filteredClients.map((client) => (
-          <ListItem key={client.id} button>
+          <ListItem 
+            key={client.id} 
+            button
+            onClick={() => navigate(`/clients/${client.id}`)}
+          >
             <ListItemAvatar>
               <Avatar src={client.avatarUrl} alt={client.name}>
                 {client.initials}
@@ -84,6 +136,53 @@ const ClientListPage = () => {
           </ListItem>
         ))}
       </List>
+
+      <Fab
+        color="primary"
+        aria-label="add"
+        sx={{ position: 'fixed', bottom: 80, right: 16 }}
+        onClick={handleOpenDialog}
+      >
+        <Add />
+      </Fab>
+
+      <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+        <DialogTitle>Dodaj nowego klienta</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="Nazwa klienta"
+            value={newClient.name}
+            onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
+            sx={{ mt: 2, mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            label="Kontakt (telefon lub email)"
+            value={newClient.contact}
+            onChange={(e) => setNewClient({ ...newClient, contact: e.target.value })}
+            sx={{ mb: 2 }}
+          />
+          <FormControl fullWidth>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={newClient.status}
+              label="Status"
+              onChange={(e) => setNewClient({ ...newClient, status: e.target.value })}
+            >
+              <MenuItem value="active">Aktywny</MenuItem>
+              <MenuItem value="pending">Oczekujący</MenuItem>
+              <MenuItem value="problem">Problem</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Anuluj</Button>
+          <Button onClick={handleAddClient} variant="contained">
+            Dodaj
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
