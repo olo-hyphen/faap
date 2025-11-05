@@ -24,6 +24,7 @@ import {
   FormatPaint,
 } from '@mui/icons-material';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const summaryData = [
   { title: 'Aktywne zlecenia', value: '8', change: '+2%', changeColor: 'success.main' },
@@ -44,10 +45,19 @@ const recentActivities = [
 ];
 
 const DashboardPage = () => {
+    const navigate = useNavigate();
     const [tabValue, setTabValue] = useState(0);
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
+    };
+
+    const handleAddJob = () => {
+        navigate('/jobs');
+    };
+
+    const handleAddClient = () => {
+        navigate('/clients');
     };
 
   return (
@@ -110,12 +120,22 @@ const DashboardPage = () => {
 
       <Grid container spacing={2} sx={{ my: 2 }}>
         <Grid item xs={12} sm={6}>
-            <Button variant="contained" fullWidth startIcon={<AddCircle />}>
+            <Button 
+                variant="contained" 
+                fullWidth 
+                startIcon={<AddCircle />}
+                onClick={handleAddJob}
+            >
                 Dodaj zlecenie
             </Button>
         </Grid>
         <Grid item xs={12} sm={6}>
-            <Button variant="outlined" fullWidth startIcon={<PersonAdd />}>
+            <Button 
+                variant="outlined" 
+                fullWidth 
+                startIcon={<PersonAdd />}
+                onClick={handleAddClient}
+            >
                 Dodaj klienta
             </Button>
         </Grid>
