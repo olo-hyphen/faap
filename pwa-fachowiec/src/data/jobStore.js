@@ -19,7 +19,7 @@ return id;
 // FUNKCJA: Pobieranie wszystkich zleceń (działa offline)
 export async function getAllJobs() {
 const jobs = [];
-await jobStore.iterate((value, key, iterationNumber) => {
+await jobStore.iterate((value) => {
 jobs.push(value);
 });
 return jobs;
