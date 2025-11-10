@@ -23,6 +23,7 @@ import {
   Description,
 } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
+import TimeTracker from '../components/TimeTracker';
 
 const mockJobs = [
   {
@@ -203,6 +204,8 @@ const JobDetailPage = () => {
           )}
         </CardContent>
       </Card>
+
+      <TimeTracker jobId={job.id} />
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <Button
